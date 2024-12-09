@@ -27,7 +27,7 @@
             app:cardCornerRadius="15dp"
             app:cardElevation="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView3" >
+            app:layout_constraintTop_toBottomOf="@+id/ViewAllItem" >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -323,7 +323,7 @@
             app:srcCompat="@drawable/logo" />
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView3"
+            android:id="@+id/ViewAllItem"
             android:layout_width="150dp"
             android:layout_height="100dp"
             android:layout_marginStart="232dp"
@@ -362,7 +362,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView7"
+            android:id="@+id/Logout"
             android:layout_width="150dp"
             android:layout_height="100dp"
             android:layout_marginStart="232dp"

@@ -37,6 +37,9 @@ class MainActivity : AppCompatActivity() {
         binding.ViewAllItem.setOnClickListener {
             startActivity(Intent(this, AllitemActivity::class.java))
         }
-
+        binding.cardViewManageOrder.setOnClickListener {
+            //intent den PendingOrderActivity
+            startActivity(Intent(this, PendingOrderActivity::class.java))
+        }
     }
 }

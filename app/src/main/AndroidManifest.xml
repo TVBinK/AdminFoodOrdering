@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
+        <activity android:name="com.example.foododering.ShowListOrderActivity" />
+        <activity
+            android:name=".PendingOrderActivity"
+            android:exported="false" />
         <activity
             android:name=".AllitemActivity"
             android:exported="false" />

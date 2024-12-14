@@ -42,8 +42,10 @@ class PendingOrderAdapter(
                 }else if(order.orderAccepted == "Rejected"){
                     imgStatus.setImageResource(com.example.adminfoodordering.R.drawable.img_rejected)
                 }
-                val uri = order.foodImages?.firstOrNull()?.let { Uri.parse(it) }
-                Glide.with(context).load(uri).into(imgViewItem)
+                else if(order.orderAccepted == "Completed"){
+                    imgStatus.setImageResource(com.example.adminfoodordering.R.drawable.img_completed)
+                }
+
 
                 root.setOnClickListener {
                     onItemClick(order)

@@ -54,6 +54,15 @@ class ShowListOrderActivity : AppCompatActivity() {
             )
         }
 
+        // Button Completed
+        binding.btnCompleted.setOnClickListener {
+            showConfirmationDialog(
+                "Complete Order",
+                "Are you sure you want to mark this order as completed?",
+                onConfirm = { updateOrderStatus(selectedOrder, "Completed") }
+            )
+        }
+
         // Display customer information
         binding.tvName.text = selectedOrder?.userName ?: "N/A"
         binding.tvAddress.text = selectedOrder?.address ?: "N/A"

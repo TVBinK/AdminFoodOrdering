@@ -18,6 +18,16 @@
 
         <!-- CardView -->
 
+        <ImageView
+            android:id="@+id/imageView14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/background_main" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView5"
             android:layout_width="150dp"
@@ -311,13 +321,14 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Logo ImageView -->
+
         <ImageView
             android:id="@+id/imageView4"
             android:layout_width="76dp"
             android:layout_height="102dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toStartOf="@+id/textView"
-            app:layout_constraintHorizontal_bias="0.64"
+            app:layout_constraintHorizontal_bias="0.516"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/logo" />

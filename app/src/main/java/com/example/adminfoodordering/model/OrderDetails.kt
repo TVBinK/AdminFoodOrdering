@@ -13,7 +13,7 @@ data class OrderDetails(
     var address: String? = null,
     var totalPrice: String? = null,
     var phoneNumber: String? = null,
-    var orderAccepted: Boolean = false,
+    var orderAccepted: String? = "Waitting",
     var paymentReceived: Boolean = false,
     var itemPushKey: String? = null,
     var currentTime: Long = 0,
@@ -30,30 +30,14 @@ data class OrderDetails(
         address = parcel.readString(),
         totalPrice = parcel.readString(),
         phoneNumber = parcel.readString(),
-        orderAccepted = parcel.readByte() != 0.toByte(),
+        orderAccepted = parcel.readString(),
         paymentReceived = parcel.readByte() != 0.toByte(),
         itemPushKey = parcel.readString(),
         currentTime = parcel.readLong(),
         orderNumber = parcel.readInt()
     )
 
-    fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(userUid)
-        parcel.writeString(userName)
-        parcel.writeStringList(foodNames)
-        parcel.writeStringList(foodImages)
-        parcel.writeStringList(foodPrices)
-        parcel.writeIntArray(foodQuantities?.toIntArray())
-        parcel.writeStringList(foodDescription)
-        parcel.writeString(address)
-        parcel.writeString(totalPrice)
-        parcel.writeString(phoneNumber)
-        parcel.writeByte(if (orderAccepted) 1 else 0)
-        parcel.writeByte(if (paymentReceived) 1 else 0)
-        parcel.writeString(itemPushKey)
-        parcel.writeLong(currentTime)
-        parcel.writeInt(orderNumber)
-    }
+
 
     fun describeContents(): Int = 0
 

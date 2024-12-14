@@ -4,7 +4,6 @@ package com.example.adminfoodordering
 import OrderDetails
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.adminfoodordering.Adapter.PendingOrderAdapter
@@ -28,7 +27,9 @@ class PendingOrderActivity : AppCompatActivity() {
         binding = ActivityPendingOrderBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        enableEdgeToEdge()
+        binding.btnBack3.setOnClickListener{
+            finish()
+        }
 
         database = FirebaseDatabase.getInstance()
         databaseOrderDetails = database.getReference("OrderDetails")
@@ -61,6 +62,7 @@ class PendingOrderActivity : AppCompatActivity() {
             val intent = Intent(this, ShowListOrderActivity::class.java)
             intent.putExtra("selectedOrder", selectedOrder)
             startActivity(intent)
+            finish()
         }
         binding.PendingOrdersRecycleView.adapter = adapter
     }

@@ -1,4 +1,5 @@
 package com.example.adminfoodordering
+
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -34,12 +35,13 @@ class AllitemActivity : AppCompatActivity() {
     private fun retrieveMenuItems() {
         database = FirebaseDatabase.getInstance()
         val foodRef: DatabaseReference = database.reference.child("menu")
-        //fetch data from database
+        // Fetch data from database
         foodRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 menuItems.clear()
                 for (foodSnapshot in snapshot.children) {
                     val menuItem = foodSnapshot.getValue(AllMenu::class.java)
+                    menuItem?.key = foodSnapshot.key // Gắn key vào menuItem
                     menuItem?.let {
                         menuItems.add(it)
                     }
@@ -48,15 +50,14 @@ class AllitemActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.d("databaseError","${error.message}")
+                Log.d("databaseError", "${error.message}")
             }
         })
     }
 
     private fun setupRecyclerView() {
-        val adapter = AdapterMenu(this@AllitemActivity,menuItems,databaseReference)
+        val adapter = AdapterMenu(this@AllitemActivity, menuItems, databaseReference)
         binding.AllitemRecycleView.layoutManager = LinearLayoutManager(this)
         binding.AllitemRecycleView.adapter = adapter
     }
-
 }

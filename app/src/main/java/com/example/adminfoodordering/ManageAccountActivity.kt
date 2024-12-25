@@ -32,12 +32,15 @@ class ManageAccountActivity : AppCompatActivity(), AdapterUser.OnItemClickListen
 
         // Tải danh sách người dùng từ Firebase
         loadUsersByUID()
+        binding.btnBack4.setOnClickListener{
+            finish()
+        }
     }
 
     private fun setupRecyclerView() {
         // Thiết lập layout manager theo chiều ngang
         adapterUser = AdapterUser(this, userList, databaseReference, this)
-        binding.RecycleViewUsers.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.RecycleViewUsers.layoutManager = LinearLayoutManager(this)
         binding.RecycleViewUsers.adapter = adapterUser
     }
 

@@ -8,6 +8,20 @@
     android:background="#ffff"
     tools:context=".ManageAccountActivity">
 
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="36dp"
+        android:fontFamily="@font/abel"
+        android:text="Users"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBack4" />
+
     <ImageButton
         android:id="@+id/btnBack4"
         android:layout_width="45dp"
@@ -35,13 +49,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/tvs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="484dp"
         android:fontFamily="@font/abel"
-        android:text="Users"
+        android:text="Shippers"
         android:textColor="@color/black"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -52,12 +66,13 @@
 
         android:id="@+id/RecycleViewUsers"
         android:layout_width="409dp"
-        android:layout_height="wrap_content"
+        android:layout_height="403dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        tools:listitem="@layout/account_item" />
 </androidx.constraintlayout.widget.ConstraintLayout>

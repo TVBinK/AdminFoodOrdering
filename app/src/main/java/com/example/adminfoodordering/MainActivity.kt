@@ -48,6 +48,9 @@ class MainActivity : AppCompatActivity() {
         binding.cardViewManageAccount.setOnClickListener {
             startActivity(Intent(this, ManageAccountActivity::class.java))
         }
+        binding.cardViewReport.setOnClickListener {
+            startActivity(Intent(this, ReportActivity::class.java))
+        }
     }
 
     // Hàm đếm số lượng đơn hàng "Completed" và tính tổng tiền

@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.adminfoodordering.Adapter.ShowListOrderAdapter
+import com.example.adminfoodordering.adapter.ShowListOrderAdapter
 import com.example.adminfoodordering.PendingOrderActivity
 import com.example.adminfoodordering.databinding.ActivityShowListOrderBinding
 import com.google.firebase.database.DatabaseReference

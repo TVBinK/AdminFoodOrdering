@@ -1,4 +1,4 @@
-package com.example.adminfoodordering.Adapter
+package com.example.adminfoodordering.adapter
 
 import android.content.Context
 import android.net.Uri

@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.adminfoodordering.Adapter.AdapterMenu
+import com.example.adminfoodordering.adapter.AdapterMenu
 import com.example.adminfoodordering.model.AllMenu
 import com.example.adminfoodordering.databinding.ActivityAllitemBinding
 import com.google.firebase.database.DataSnapshot

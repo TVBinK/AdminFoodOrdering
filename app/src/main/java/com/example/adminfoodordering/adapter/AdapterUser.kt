@@ -56,26 +56,31 @@ class AdapterUser(
             if (userUid == null) return
 
             // Lấy dữ liệu đơn hàng của người dùng từ Firebase
-            val ordersRef = FirebaseDatabase.getInstance().getReference("users").child(userUid).child("OrderDetails")
+            val ordersRef = FirebaseDatabase.getInstance().getReference("users").child(userUid)
+                .child("OrderDetails")
             ordersRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     var totalPrice = 0.0
                     var totalOrders = 0
 
-                    // Đếm số lượng đơn hàng và tính tổng tiền
+                    // Đếm số lượng đơn hàng và tính tổng tiền với điều kiện trạng thái
                     for (orderSnapshot in snapshot.children) {
                         val order = orderSnapshot.getValue(OrderDetails::class.java)
-                        order?.totalPrice?.let {
-                            // Chuyển đổi giá trị totalPrice từ String sang Double và cộng dồn
-                            val price = it.replace("$", "").toDoubleOrNull() ?: 0.0
-                            totalPrice += price
+
+                        // Kiểm tra trạng thái orderAccepted == "Completed"
+                        if (order?.orderAccepted == "Completed") {
+                            order.totalPrice?.let {
+                                // Chuyển đổi giá trị totalPrice từ String sang Double và cộng dồn
+                                val price = it.replace("$", "").toDoubleOrNull() ?: 0.0
+                                totalPrice += price
+                            }
+                            totalOrders++ // Tăng tổng số đơn hàng có trạng thái Completed
                         }
-                        totalOrders++ // Tăng tổng số đơn hàng
                     }
 
                     // Hiển thị tổng tiền và tổng số đơn hàng
                     binding.tvPrice.text = "$${"%.2f".format(totalPrice)}"
-                    binding.tvCount.text = "$totalOrders" // Hiển thị tổng số đơn hàng
+                    binding.tvCount.text = "$totalOrders" // Hiển thị tổng số đơn hàng Completed
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -83,5 +88,6 @@ class AdapterUser(
                 }
             })
         }
+
     }
 }

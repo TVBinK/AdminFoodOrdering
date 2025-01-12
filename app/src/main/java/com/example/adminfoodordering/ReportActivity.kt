@@ -19,6 +19,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import org.apache.poi.ss.usermodel.Sheet
+
+// ReportActivity.kt
 
 class ReportActivity : AppCompatActivity() {
     private lateinit var binding: ActivityReportBinding
@@ -26,6 +29,7 @@ class ReportActivity : AppCompatActivity() {
     private lateinit var reportAdapter: ReportAdapter
     private val reportList = ArrayList<OrderDetails>()
     private val salesReport = HashMap<String, Double>()
+    private val foodCountMap = HashMap<String, Int>()
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     private var fromDate: Long = 0
@@ -36,13 +40,16 @@ class ReportActivity : AppCompatActivity() {
         binding = ActivityReportBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Khởi tạo Firebase Database
+        initializeViews()
+        setupListeners()
+    }
+
+    private fun initializeViews() {
         databaseReference = FirebaseDatabase.getInstance().getReference("OrderDetails")
-
-        // Cài đặt RecyclerView
         binding.rvReportResult.layoutManager = LinearLayoutManager(this)
+    }
 
-        // Lắng nghe sự kiện chọn ngày
+    private fun setupListeners() {
         binding.etFromDate.setOnClickListener { showDatePicker { date ->
             fromDate = date.timeInMillis
             binding.etFromDate.setText(dateFormat.format(date.time))
@@ -53,6 +60,12 @@ class ReportActivity : AppCompatActivity() {
             binding.etToDate.setText(dateFormat.format(date.time))
         } }
 
+        binding.btnGenerateReport.setOnClickListener {
+            if (validateDates()) {
+                generateSelectedReport()
+            }
+        }
+
         binding.btnExportExcel.setOnClickListener {
             when (binding.rgReportType.checkedRadioButtonId) {
                 binding.rbReportByFood.id -> exportToExcel(reportList, ReportType.BY_FOOD)
@@ -60,41 +73,44 @@ class ReportActivity : AppCompatActivity() {
                 binding.rbReportBySales.id -> exportSalesToExcel(salesReport)
             }
         }
+    }
 
-        // Lắng nghe sự kiện tạo báo cáo
-        binding.btnGenerateReport.setOnClickListener {
-            if (fromDate == 0L || toDate == 0L) {
-                Toast.makeText(this, "Vui lòng chọn ngày hợp lệ!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+    private fun validateDates(): Boolean {
+        if (fromDate == 0L || toDate == 0L) {
+            Toast.makeText(this, "Vui lòng chọn ngày!", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
+    }
 
-            // Kiểm tra loại báo cáo: theo món ăn, khách hàng, hoặc doanh số theo ngày
-            when (binding.rgReportType.checkedRadioButtonId) {
-                binding.rbReportByFood.id -> generateReport(fromDate, toDate, ReportType.BY_FOOD)
-                binding.rbReportByCustomer.id -> generateReport(fromDate, toDate, ReportType.BY_CUSTOMER)
-                binding.rbReportBySales.id -> generateSalesReport(fromDate, toDate)
-            }
+    private fun generateSelectedReport() {
+        when (binding.rgReportType.checkedRadioButtonId) {
+            binding.rbReportByFood.id -> generateReport(fromDate, toDate, ReportType.BY_FOOD)
+            binding.rbReportByCustomer.id -> generateReport(fromDate, toDate, ReportType.BY_CUSTOMER)
+            binding.rbReportBySales.id -> generateSalesReport(fromDate, toDate)
         }
     }
 
     private fun showDatePicker(onDateSelected: (Calendar) -> Unit) {
         val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-            val selectedDate = Calendar.getInstance()
-            selectedDate.set(selectedYear, selectedMonth, selectedDay)
-            onDateSelected(selectedDate)
-        }, year, month, day)
-
-        datePickerDialog.show()
+        DatePickerDialog(
+            this,
+            { _, year, month, day ->
+                val selectedDate = Calendar.getInstance().apply {
+                    set(year, month, day)
+                }
+                onDateSelected(selectedDate)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
     }
 
     private fun generateReport(fromDate: Long, toDate: Long, reportType: ReportType) {
         binding.progressBar.visibility = View.VISIBLE
         reportList.clear()
+        foodCountMap.clear()
 
         databaseReference
             .orderByChild("currentTime")
@@ -104,26 +120,32 @@ class ReportActivity : AppCompatActivity() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (orderSnapshot in snapshot.children) {
                         val order = orderSnapshot.getValue(OrderDetails::class.java)
-                        if (order != null) {
-                            reportList.add(order)
+                        order?.let {
+                            reportList.add(it)
+                            if (reportType == ReportType.BY_FOOD) {
+                                countFoodItems(it)
+                            }
                         }
                     }
 
-                    reportAdapter = ReportAdapter(this@ReportActivity, reportList, reportType)
-                    binding.rvReportResult.adapter = reportAdapter
-
+                    updateAdapter(reportType)
                     binding.progressBar.visibility = View.GONE
 
                     if (reportList.isEmpty()) {
-                        Toast.makeText(this@ReportActivity, "Không có dữ liệu trong khoảng thời gian này!", Toast.LENGTH_SHORT).show()
+                        showNoDataToast()
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this@ReportActivity, "Lỗi khi tải dữ liệu: ${error.message}", Toast.LENGTH_SHORT).show()
+                    handleDatabaseError(error)
                 }
             })
+    }
+
+    private fun countFoodItems(order: OrderDetails) {
+        order.foodNames?.forEach { foodName ->
+            foodCountMap[foodName] = (foodCountMap[foodName] ?: 0) + 1
+        }
     }
 
     private fun generateSalesReport(fromDate: Long, toDate: Long) {
@@ -138,28 +160,45 @@ class ReportActivity : AppCompatActivity() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (orderSnapshot in snapshot.children) {
                         val order = orderSnapshot.getValue(OrderDetails::class.java)
-                        if (order != null) {
-                            val orderDate = dateFormat.format(Date(order.currentTime))
-                            val orderTotal = order.totalPrice?.replace("$", "")?.toDoubleOrNull() ?: 0.0
-                            salesReport[orderDate] = (salesReport[orderDate] ?: 0.0) + orderTotal
-                        }
+                        order?.let { processOrderForSalesReport(it) }
                     }
 
-                    reportAdapter = ReportAdapter(this@ReportActivity, salesReport)
-                    binding.rvReportResult.adapter = reportAdapter
-
+                    updateAdapter(ReportType.BY_SALES)
                     binding.progressBar.visibility = View.GONE
 
                     if (salesReport.isEmpty()) {
-                        Toast.makeText(this@ReportActivity, "Không có dữ liệu doanh số trong khoảng thời gian này!", Toast.LENGTH_SHORT).show()
+                        showNoDataToast()
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this@ReportActivity, "Lỗi khi tải dữ liệu: ${error.message}", Toast.LENGTH_SHORT).show()
+                    handleDatabaseError(error)
                 }
             })
+    }
+
+    private fun processOrderForSalesReport(order: OrderDetails) {
+        val orderDate = dateFormat.format(Date(order.currentTime))
+        val orderTotal = order.totalPrice?.replace("$", "")?.toDoubleOrNull() ?: 0.0
+        salesReport[orderDate] = (salesReport[orderDate] ?: 0.0) + orderTotal
+    }
+
+    private fun updateAdapter(reportType: ReportType) {
+        reportAdapter = when (reportType) {
+            ReportType.BY_FOOD -> ReportAdapter(this, foodCountMap = foodCountMap)
+            ReportType.BY_CUSTOMER -> ReportAdapter(this, reportList = reportList, reportType = reportType)
+            ReportType.BY_SALES -> ReportAdapter(this, salesReport = salesReport, reportType = reportType)
+        }
+        binding.rvReportResult.adapter = reportAdapter
+    }
+
+    private fun showNoDataToast() {
+        Toast.makeText(this, "Không có dữ liệu trong khoảng thời gian này!", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun handleDatabaseError(error: DatabaseError) {
+        binding.progressBar.visibility = View.GONE
+        Toast.makeText(this, "Lỗi: ${error.message}", Toast.LENGTH_SHORT).show()
     }
 
     private fun exportToExcel(reportList: List<OrderDetails>, reportType: ReportType) {
@@ -167,47 +206,12 @@ class ReportActivity : AppCompatActivity() {
             val workbook = XSSFWorkbook()
             val sheet = workbook.createSheet("Report")
 
-            // Tạo dòng tiêu đề
-            val headerRow = sheet.createRow(0)
-            val headers = when (reportType) {
-                ReportType.BY_FOOD -> listOf("Tên món", "Tổng tiền")
-                ReportType.BY_CUSTOMER -> listOf("Tên khách hàng", "Tổng tiền")
-                else -> emptyList()
-            }
+            createHeaderRow(sheet, reportType)
+            fillDataRows(sheet, reportList, reportType)
 
-            for ((index, title) in headers.withIndex()) {
-                val cell = headerRow.createCell(index)
-                cell.setCellValue(title)
-            }
-
-            // Điền dữ liệu
-            for (rowIndex in reportList.indices) {
-                val row = sheet.createRow(rowIndex + 1)
-                val order = reportList[rowIndex]
-                when (reportType) {
-                    ReportType.BY_FOOD -> {
-                        val foodNames = order.foodNames?.joinToString(", ") ?: "Không rõ"
-                        val totalPrice = order.foodPrices?.map { it.replace("$", "").toDoubleOrNull() ?: 0.0 }?.sum() ?: 0.0
-
-                        row.createCell(0).setCellValue(foodNames)
-                        row.createCell(1).setCellValue(totalPrice)
-                    }
-
-                    ReportType.BY_CUSTOMER -> {
-                        val userName = order.userName ?: "Không rõ"
-                        val totalPrice = order.totalPrice?.replace("$", "")?.toDoubleOrNull() ?: 0.0
-
-                        row.createCell(0).setCellValue(userName)
-                        row.createCell(1).setCellValue(totalPrice)
-                    }
-
-                    else -> {}
-                }
-            }
-
-            saveExcelFile(workbook, "Report_${System.currentTimeMillis()}.xlsx")
+            saveExcelFile(workbook)
         } catch (e: Exception) {
-            Toast.makeText(this, "Lỗi khi xuất Excel: ${e.message}", Toast.LENGTH_LONG).show()
+            handleExcelError(e)
         }
     }
 
@@ -216,50 +220,81 @@ class ReportActivity : AppCompatActivity() {
             val workbook = XSSFWorkbook()
             val sheet = workbook.createSheet("Sales Report")
 
-            // Tạo dòng tiêu đề
-            val headerRow = sheet.createRow(0)
-            val headers = listOf("Ngày", "Doanh số")
-            for ((index, title) in headers.withIndex()) {
-                val cell = headerRow.createCell(index)
-                cell.setCellValue(title)
-            }
+            createSalesHeaderRow(sheet)
+            fillSalesDataRows(sheet, salesReport)
 
-            // Điền dữ liệu
-            salesReport.forEach { (date, totalSales) ->
-                val rowIndex = salesReport.entries.indexOfFirst { it.key == date } + 1
-                val row = sheet.createRow(rowIndex)
-                row.createCell(0).setCellValue(date)
-                row.createCell(1).setCellValue(totalSales)
-            }
-
-            saveExcelFile(workbook, "SalesReport_${System.currentTimeMillis()}.xlsx")
+            saveExcelFile(workbook)
         } catch (e: Exception) {
-            Toast.makeText(this, "Lỗi khi xuất Excel: ${e.message}", Toast.LENGTH_LONG).show()
+            handleExcelError(e)
         }
     }
 
-    private fun saveExcelFile(workbook: XSSFWorkbook, fileName: String) {
-        try {
-            // Lưu file vào thư mục con của ứng dụng trên bộ nhớ ngoài
-            val foodExcelsDir = File(getExternalFilesDir(null), "FoodExcels")
+    private fun createHeaderRow(sheet: Sheet, reportType: ReportType) {
+        val headers = when (reportType) {
+            ReportType.BY_FOOD -> listOf("Tên món", "Số lượng")
+            ReportType.BY_CUSTOMER -> listOf("Tên khách hàng", "Tổng tiền")
+            else -> listOf()
+        }
 
-            // Nếu thư mục không tồn tại, tạo thư mục
-            if (!foodExcelsDir.exists()) {
-                foodExcelsDir.mkdirs()
+        val headerRow = sheet.createRow(0)
+        headers.forEachIndexed { index, title ->
+            headerRow.createCell(index).setCellValue(title)
+        }
+    }
+
+    private fun createSalesHeaderRow(sheet: Sheet) {
+        val headerRow = sheet.createRow(0)
+        headerRow.createCell(0).setCellValue("Ngày")
+        headerRow.createCell(1).setCellValue("Doanh số")
+    }
+
+    private fun fillDataRows(sheet: Sheet, reportList: List<OrderDetails>, reportType: ReportType) {
+        reportList.forEachIndexed { index, order ->
+            val row = sheet.createRow(index + 1)
+            when (reportType) {
+                ReportType.BY_FOOD -> {
+                    row.createCell(0).setCellValue(order.foodNames?.joinToString(", ") ?: "")
+                    row.createCell(1).setCellValue(
+                        order.foodPrices?.size?.toString() ?: "0"
+                    )
+                }
+                ReportType.BY_CUSTOMER -> {
+                    row.createCell(0).setCellValue(order.userName ?: "Unknown")
+                    row.createCell(1).setCellValue(
+                        order.totalPrice?.replace("$", "")?.toDoubleOrNull() ?: 0.0
+                    )
+                }
+                else -> {}
             }
+        }
+    }
 
-            // Tạo file Excel trong thư mục "FoodExcels"
-            val file = File(foodExcelsDir, fileName)
-            val outputStream = FileOutputStream(file)
+    private fun fillSalesDataRows(sheet: Sheet, salesReport: Map<String, Double>) {
+        salesReport.entries.forEachIndexed { index, (date, amount) ->
+            val row = sheet.createRow(index + 1)
+            row.createCell(0).setCellValue(date)
+            row.createCell(1).setCellValue(amount)
+        }
+    }
+
+    private fun saveExcelFile(workbook: XSSFWorkbook) {
+        val foodExcelsDir = File(getExternalFilesDir(null), "FoodExcels").apply {
+            if (!exists()) mkdirs()
+        }
+
+        val fileName = "Report_${System.currentTimeMillis()}.xlsx"
+        val file = File(foodExcelsDir, fileName)
+
+        FileOutputStream(file).use { outputStream ->
             workbook.write(outputStream)
-            outputStream.close()
             workbook.close()
-
-            Toast.makeText(this, "Đã lưu file Excel: ${file.absolutePath}", Toast.LENGTH_LONG).show()
-            Log.d("ExcelExport", "Đã lưu file Excel: ${file.absolutePath}")
-        } catch (e: Exception) {
-            Toast.makeText(this, "Lỗi khi lưu file Excel: ${e.message}", Toast.LENGTH_LONG).show()
         }
+
+        Toast.makeText(this, "Đã lưu file Excel: ${file.absolutePath}", Toast.LENGTH_LONG).show()
+        Log.d("ExcelExport", "Đã lưu file Excel: ${file.absolutePath}")
     }
 
+    private fun handleExcelError(e: Exception) {
+        Toast.makeText(this, "Lỗi khi xuất Excel: ${e.message}", Toast.LENGTH_LONG).show()
+    }
 }

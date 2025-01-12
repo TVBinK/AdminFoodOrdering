@@ -4,31 +4,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/white"
     android:padding="16dp">
 
     <!-- Chọn loại báo cáo -->
     <RadioGroup
         android:id="@+id/rgReportType"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <RadioButton
             android:id="@+id/rbReportByFood"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Báo cáo theo món ăn" />
+            android:text="Report by Dish" />
 
         <RadioButton
             android:id="@+id/rbReportByCustomer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Báo cáo theo khách hàng" />
+            android:text="Report by Customer" />
         <RadioButton
             android:id="@+id/rbReportBySales"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Báo cáo doanh số theo ngày" />
+            android:text="Report by Day" />
 
     </RadioGroup>
 
@@ -37,7 +38,7 @@
         android:id="@+id/etFromDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ngày bắt đầu (dd/MM/yyyy)"
+        android:hint="Start date (dd/MM/yyyy)"
         android:focusable="false"
         android:layout_marginBottom="16dp" />
 
@@ -46,16 +47,18 @@
         android:id="@+id/etToDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ngày kết thúc (dd/MM/yyyy)"
+        android:hint="End date (dd/MM/yyyy)"
         android:focusable="false"
         android:layout_marginBottom="16dp" />
 
     <!-- Nút tạo báo cáo -->
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnGenerateReport"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tạo báo cáo"
+        android:text="Generate Report"
+        android:textColor="@color/white"
+        android:background="@drawable/purplebutton"
         android:layout_marginBottom="16dp"/>
 
     <!-- ProgressBar -->
@@ -73,10 +76,12 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="16dp" />
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnExportExcel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Xuất Excel" />
+        android:textColor="@color/white"
+        android:background="@drawable/purplebutton"
+        android:text="Export to Excel" />
 
 </LinearLayout>

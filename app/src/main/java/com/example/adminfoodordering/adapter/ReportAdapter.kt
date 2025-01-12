@@ -8,21 +8,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.adminfoodordering.databinding.ReportItemBinding
 import com.example.adminfoodordering.model.ReportType
 
+// ReportAdapter.kt
+
 class ReportAdapter(
     private val context: Context,
-    private val reportList: ArrayList<OrderDetails>,
-    private val reportType: ReportType
+    private val foodCountMap: Map<String, Int>? = null,
+    private val reportList: ArrayList<OrderDetails> = ArrayList(),
+    private val salesReport: Map<String, Double>? = null,
+    private val reportType: ReportType = ReportType.BY_FOOD
 ) : RecyclerView.Adapter<ReportAdapter.ReportViewHolder>() {
-
-    private var salesReport: Map<String, Double>? = null
-
-    constructor(context: Context, salesReport: Map<String, Double>) : this(
-        context,
-        ArrayList(),
-        ReportType.BY_SALES
-    ) {
-        this.salesReport = salesReport
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportViewHolder {
         val binding = ReportItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -34,10 +28,10 @@ class ReportAdapter(
     }
 
     override fun getItemCount(): Int {
-        return if (reportType == ReportType.BY_SALES) {
-            salesReport?.size ?: 0
-        } else {
-            reportList.size
+        return when (reportType) {
+            ReportType.BY_FOOD -> foodCountMap?.size ?: 0
+            ReportType.BY_SALES -> salesReport?.size ?: 0
+            ReportType.BY_CUSTOMER -> reportList.size
         }
     }
 
@@ -46,41 +40,43 @@ class ReportAdapter(
 
         fun bind(position: Int) {
             when (reportType) {
-                ReportType.BY_FOOD -> loadFoodData(reportList[position], binding)
-                ReportType.BY_CUSTOMER -> loadCustomerData(reportList[position], binding)
-                ReportType.BY_SALES -> loadSalesData(position, binding)
+                ReportType.BY_FOOD -> bindFoodReport(position)
+                ReportType.BY_CUSTOMER -> bindCustomerReport(position)
+                ReportType.BY_SALES -> bindSalesReport(position)
             }
         }
 
-        private fun loadFoodData(order: OrderDetails, binding: ReportItemBinding) {
-            val foodNames = order.foodNames ?: return
-            val totalPrice =
-                order.foodPrices?.map { it.replace("$", "").toDoubleOrNull() ?: 0.0 }?.sum() ?: 0.0
-
-            binding.tvReportItem.text = """
-                Món ăn: ${foodNames.joinToString(", ")}
-                Tổng tiền: $${"%.2f".format(totalPrice)}
-            """.trimIndent()
+        private fun bindFoodReport(position: Int) {
+            foodCountMap?.let { map ->
+                val foodName = map.keys.elementAt(position)
+                val count = map[foodName] ?: 0
+                binding.tvReportItem.text = "$foodName: $count phần"
+            }
         }
 
-        private fun loadCustomerData(order: OrderDetails, binding: ReportItemBinding) {
+        private fun bindCustomerReport(position: Int) {
+            val order = reportList[position]
             val userName = order.userName ?: "Không rõ"
             val totalPrice = order.totalPrice?.replace("$", "")?.toDoubleOrNull() ?: 0.0
 
-            binding.tvReportItem.text = """
-                Khách hàng: $userName
-                Tổng tiền: $${"%.2f".format(totalPrice)}
-            """.trimIndent()
+            binding.tvReportItem.text = buildString {
+                appendLine("Khách hàng: $userName")
+                append("Tổng tiền: $${formatCurrency(totalPrice)}")
+            }
         }
 
-        private fun loadSalesData(position: Int, binding: ReportItemBinding) {
-            val salesDate = salesReport!!.keys.toList()[position]
-            val totalSales = salesReport!![salesDate] ?: 0.0
+        private fun bindSalesReport(position: Int) {
+            salesReport?.let { report ->
+                val date = report.keys.elementAt(position)
+                val amount = report[date] ?: 0.0
 
-            binding.tvReportItem.text = """
-                Ngày: $salesDate
-                Doanh số: $${"%.2f".format(totalSales)}
-            """.trimIndent()
+                binding.tvReportItem.text = buildString {
+                    appendLine("Ngày: $date")
+                    append("Doanh số: $${formatCurrency(amount)}")
+                }
+            }
         }
+
+        private fun formatCurrency(amount: Double): String = "%.2f".format(amount)
     }
 }

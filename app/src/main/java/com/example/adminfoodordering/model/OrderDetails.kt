@@ -17,7 +17,8 @@ data class OrderDetails(
     var paymentReceived: Boolean = false,
     var itemPushKey: String? = null,
     var currentTime: Long = 0,
-    var orderNumber: Int = 0
+    var orderNumber: Int = 0,
+    var shipperName: String? = null
 ) : Serializable {
     constructor(parcel: Parcel) : this(
         userUid = parcel.readString(),

@@ -6,7 +6,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.adminfoodordering.adapter.AdapterShipper
 import com.example.adminfoodordering.databinding.ActivityManageAccountBinding
+import com.example.adminfoodordering.model.Shipper
 import com.example.adminfoodordering.model.User
 import com.example.foododering.Adapter.AdapterUser
 import com.google.firebase.database.*
@@ -16,7 +18,9 @@ class ManageAccountActivity : AppCompatActivity(), AdapterUser.OnItemClickListen
     private lateinit var binding: ActivityManageAccountBinding
     private lateinit var databaseReference: DatabaseReference
     private lateinit var userList: ArrayList<User>
+    private lateinit var shipperList: ArrayList<Shipper>
     private lateinit var adapterUser: AdapterUser
+    private lateinit var adapterShipper: AdapterShipper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,34 +28,46 @@ class ManageAccountActivity : AppCompatActivity(), AdapterUser.OnItemClickListen
         setContentView(binding.root)
 
         // Khởi tạo Firebase reference
-        databaseReference = FirebaseDatabase.getInstance().getReference("users")
+        databaseReference = FirebaseDatabase.getInstance().reference
         userList = ArrayList()
+        shipperList = ArrayList()
 
         // Cài đặt RecyclerView
-        setupRecyclerView()
+        setupRecyclerViewUsers()
+        setupRecyclerViewShippers()
 
-        // Tải danh sách người dùng từ Firebase
-        loadUsersByUID()
-        binding.btnBack4.setOnClickListener{
+        // Tải dữ liệu từ Firebase
+        loadUsersFromFirebase()
+        loadShippersFromFirebase()
+
+        // Xử lý nút quay lại
+        binding.btnBack4.setOnClickListener {
             finish()
         }
     }
 
-    private fun setupRecyclerView() {
-        // Thiết lập layout manager theo chiều ngang
-        adapterUser = AdapterUser(this, userList, databaseReference, this)
+    private fun setupRecyclerViewShippers() {
+        // Thiết lập RecyclerView cho Shipper
+        binding.RecycleViewShippers.layoutManager = LinearLayoutManager(this)
+        adapterShipper = AdapterShipper(this, shipperList)
+        binding.RecycleViewShippers.adapter = adapterShipper
+    }
+
+    private fun setupRecyclerViewUsers() {
+        // Thiết lập RecyclerView cho User
         binding.RecycleViewUsers.layoutManager = LinearLayoutManager(this)
+        adapterUser = AdapterUser(this, userList, databaseReference, this)
         binding.RecycleViewUsers.adapter = adapterUser
     }
 
-    private fun loadUsersByUID() {
-        databaseReference.addValueEventListener(object : ValueEventListener {
+    private fun loadUsersFromFirebase() {
+        databaseReference.child("users").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 userList.clear()
                 for (userSnapshot in snapshot.children) {
                     val user = userSnapshot.getValue(User::class.java)
                     user?.let {
-                        it.uid = userSnapshot.key // Gán UID từ key của node trong Firebase
+                        it.uid = userSnapshot.key // Gán UID từ key của node
                         userList.add(it)
                     }
                 }
@@ -59,7 +75,28 @@ class ManageAccountActivity : AppCompatActivity(), AdapterUser.OnItemClickListen
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@ManageAccountActivity, "Failed to load users", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ManageAccountActivity, "Lỗi khi tải danh sách người dùng", Toast.LENGTH_SHORT).show()
+                Log.e("FirebaseError", error.message)
+            }
+        })
+    }
+
+    private fun loadShippersFromFirebase() {
+        databaseReference.child("shippers").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                shipperList.clear()
+                for (shipperSnapshot in snapshot.children) {
+                    val name = shipperSnapshot.child("name").getValue(String::class.java) ?: "Không xác định"
+                    val phone = shipperSnapshot.child("phone").getValue(String::class.java) ?: "Không xác định"
+                    if (name.isNotBlank() && phone.isNotBlank()) {
+                        shipperList.add(Shipper(name, phone, "0.0", "0.0", ""))
+                    }
+                }
+                adapterShipper.notifyDataSetChanged()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@ManageAccountActivity, "Lỗi khi tải danh sách shipper", Toast.LENGTH_SHORT).show()
                 Log.e("FirebaseError", error.message)
             }
         })

@@ -35,7 +35,8 @@ class PendingOrderAdapter(
                 tvCustomerName.text = order.userName
                 tvQuantity.text = order.foodQuantities?.sum()?.toString() ?: "0"
                 tvPrice.text = order.totalPrice
-                    if(order.orderAccepted == "Accepted"){
+
+                if(order.orderAccepted == "Accepted"){
                     imgStatus.setImageResource(com.example.adminfoodordering.R.drawable.img_accepted)
                 }else if(order.orderAccepted == "Rejected"){
                     imgStatus.setImageResource(com.example.adminfoodordering.R.drawable.img_rejected)

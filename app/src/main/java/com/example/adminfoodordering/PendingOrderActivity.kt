@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.adminfoodordering.adapter.PendingOrderAdapter
 import com.example.adminfoodordering.databinding.ActivityPendingOrderBinding
-import com.example.foododering.ShowListOrderActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference

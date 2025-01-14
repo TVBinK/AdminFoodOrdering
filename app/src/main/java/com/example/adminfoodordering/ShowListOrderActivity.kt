@@ -1,4 +1,4 @@
-package com.example.foododering
+package com.example.adminfoodordering
 
 import OrderDetails
 import android.content.Intent
@@ -8,7 +8,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.adminfoodordering.adapter.ShowListOrderAdapter
-import com.example.adminfoodordering.PendingOrderActivity
 import com.example.adminfoodordering.databinding.ActivityShowListOrderBinding
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -54,7 +53,7 @@ class ShowListOrderActivity : AppCompatActivity() {
             )
         }
 
-        // Button Completed
+        // Completed button
         binding.btnCompleted.setOnClickListener {
             showConfirmationDialog(
                 "Complete Order",
@@ -68,7 +67,7 @@ class ShowListOrderActivity : AppCompatActivity() {
         binding.tvAddress.text = selectedOrder?.address ?: "N/A"
         binding.tvPhone.text = selectedOrder?.phoneNumber ?: "N/A"
         binding.tvTotal.text = selectedOrder?.totalPrice?.toString() ?: "0.00"
-
+        binding.tvShipper.text = selectedOrder?.shipperName ?: "Not delivered yet"
         // Get food details for displaying in the list
         val foodNameList = selectedOrder?.foodNames ?: emptyList()
         val foodPriceList = selectedOrder?.foodPrices ?: emptyList()
@@ -108,11 +107,16 @@ class ShowListOrderActivity : AppCompatActivity() {
             databaseAdminReference.child("OrderDetails").child(pushKey).child("orderAccepted").setValue(status)
 
             Toast.makeText(this, "$status Order successfully", Toast.LENGTH_SHORT).show()
-
-            // Navigate to PendingOrderActivity
-            val intent = Intent(this, PendingOrderActivity::class.java)
-            startActivity(intent)
-            finish() // Close the current activity
+            if (status == "Accepted") {
+                val intent = Intent(this, ChooseShipperActivity::class.java)
+                intent.putExtra("ORDER_ID", pushKey) // Truyền orderId (pushKey)
+                startActivity(intent)
+                finish()
+            } else {
+                val intent = Intent(this, PendingOrderActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
         } else {
             Toast.makeText(this, "Failed to update order status", Toast.LENGTH_SHORT).show()
         }

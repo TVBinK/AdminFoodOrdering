@@ -9,11 +9,25 @@
     >
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCompleted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/btn_completed"
+        android:text="  Completed Order  "
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@+id/btnReject"
+        app:layout_constraintStart_toEndOf="@+id/btnAccept"
+        app:layout_constraintTop_toBottomOf="@+id/RecycleView" />
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnAccept"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/btn_accept"
         android:text="Accept"
         android:textColor="@color/white"
@@ -21,17 +35,15 @@
         app:layout_constraintTop_toBottomOf="@+id/RecycleView" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnCompleted"
+        android:id="@+id/btnReject"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="24dp"
-        android:background="@drawable/btn_completed"
-        android:text="  Completed Order  "
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/btn_reject"
+        android:text="Reject"
         android:textColor="@color/white"
-        app:layout_constraintEnd_toStartOf="@+id/btnReject"
-        app:layout_constraintStart_toEndOf="@+id/btnAccept"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/RecycleView" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -67,7 +79,6 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/abel"
-            android:text="Tao Là Bin"
             android:textColor="@color/black"
             android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@+id/textView223"
@@ -107,7 +118,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/abel"
-            android:text="Tao Là Bin"
+            android:textStyle="bold"
             android:textColor="@color/black"
             android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@+id/textView22"
@@ -147,7 +158,6 @@
             android:layout_marginStart="28dp"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/abel"
-            android:text="Tao Là Bin"
             android:textColor="#6B50F6"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -187,7 +197,7 @@
         android:layout_width="406dp"
         android:layout_height="340dp"
         android:layout_marginStart="1dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="76dp"
         android:layout_marginEnd="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.333"
@@ -228,23 +238,47 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/abel"
-            android:text="Tao Là Bin"
             android:textColor="@color/black"
             android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@+id/textView222"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnReject"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/btn_reject"
-        android:text="Reject"
-        android:textColor="@color/white"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2222"
+        android:layout_width="355dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/edittextshape"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/RecycleView" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout222">
+
+        <TextView
+            android:id="@+id/textView12q"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/abel"
+            android:text="Shipper: "
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvShipper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/abel"
+            android:textColor="#A098CC"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/textView12q"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

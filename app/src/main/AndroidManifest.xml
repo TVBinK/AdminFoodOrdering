@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -13,17 +14,18 @@
         android:roundIcon="@mipmap/logoadmin"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-
         tools:targetApi="31">
-        <activity android:name=".ReportActivity"></activity>
-
+        <activity
+            android:name=".ChooseShipperActivity"
+            android:exported="false" />
+        <activity android:name=".ReportActivity" />
         <activity
             android:name=".DetailUserActivity"
             android:exported="false" />
         <activity
             android:name=".ManageAccountActivity"
             android:exported="false" />
-        <activity android:name="com.example.foododering.ShowListOrderActivity" />
+        <activity android:name="com.example.adminfoodordering.ShowListOrderActivity" />
         <activity
             android:name=".PendingOrderActivity"
             android:exported="false" />

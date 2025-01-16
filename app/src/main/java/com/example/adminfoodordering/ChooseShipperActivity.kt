@@ -15,6 +15,7 @@ class ChooseShipperActivity : AppCompatActivity() {
     private lateinit var adapter: ChooseShipperAdapter
     private lateinit var databaseReference: DatabaseReference
     private lateinit var orderId: String
+    private lateinit var userId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +24,8 @@ class ChooseShipperActivity : AppCompatActivity() {
 
         // Lấy orderId từ Intent
         orderId = intent.getStringExtra("ORDER_ID") ?: ""
+        //Lấy UserID từ Intent
+        userId = intent.getStringExtra("USER_ID") ?: ""
 
         // Khởi tạo tham chiếu Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference("shippers")
@@ -36,6 +39,9 @@ class ChooseShipperActivity : AppCompatActivity() {
 
         // Tải danh sách shipper từ Firebase
         loadShippersFromFirebase()
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
     }
 
     private fun loadShippersFromFirebase() {
@@ -43,9 +49,10 @@ class ChooseShipperActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val shippers = mutableListOf<Shipper>()
                 for (shipperSnapshot in snapshot.children) {
+                    val shipperId = shipperSnapshot.key ?: continue
                     val name = shipperSnapshot.child("name").getValue(String::class.java) ?: "Không xác định"
                     val phone = shipperSnapshot.child("phone").getValue(String::class.java) ?: "Không xác định"
-                    shippers.add(Shipper(name, phone, "0.0", "0.0", ""))
+                    shippers.add(Shipper(shipperId,name, phone, "0.0", "0.0", ""))
                 }
                 adapter.updateData(shippers)
             }
@@ -77,14 +84,16 @@ class ChooseShipperActivity : AppCompatActivity() {
     }
 
     private fun assignShipperToOrder(orderId: String, shipper: Shipper) {
-        val orderRef = FirebaseDatabase.getInstance().getReference("OrderDetails").child(orderId)
-
+        val orderRefAdmin = FirebaseDatabase.getInstance().getReference("OrderDetails").child(orderId)
+        val orderRefUser = FirebaseDatabase.getInstance().getReference("users").child(userId).child("OrderDetails").child(orderId)
+        // Cập nhật thông tin shipper cho đơn hàng
         val shipperData = mapOf(
+            "shipperID" to shipper.shipperID,
             "shipperName" to shipper.name,
             "shipperPhone" to shipper.phone
         )
 
-        orderRef.updateChildren(shipperData).addOnCompleteListener { task ->
+        orderRefAdmin.updateChildren(shipperData).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Toast.makeText(this, "Đã giao đơn thành công cho shipper", Toast.LENGTH_SHORT).show()
                 finish()
@@ -92,6 +101,7 @@ class ChooseShipperActivity : AppCompatActivity() {
                 Toast.makeText(this, "Không thể giao đơn", Toast.LENGTH_SHORT).show()
             }
         }
+        orderRefUser.updateChildren(shipperData)
     }
 
 }

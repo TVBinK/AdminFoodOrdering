@@ -18,7 +18,8 @@ data class OrderDetails(
     var itemPushKey: String? = null,
     var currentTime: Long = 0,
     var orderNumber: Int = 0,
-    var shipperName: String? = null
+    var shipperName: String? = null,
+    var shipperPhone: String? = null
 ) : Serializable {
     constructor(parcel: Parcel) : this(
         userUid = parcel.readString(),
@@ -35,7 +36,9 @@ data class OrderDetails(
         paymentReceived = parcel.readByte() != 0.toByte(),
         itemPushKey = parcel.readString(),
         currentTime = parcel.readLong(),
-        orderNumber = parcel.readInt()
+        orderNumber = parcel.readInt(),
+        shipperName = parcel.readString(),
+        shipperPhone = parcel.readString()
     )
 
 

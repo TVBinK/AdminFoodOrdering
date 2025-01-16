@@ -1,12 +1,14 @@
 package com.example.adminfoodordering.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.adminfoodordering.EditFoodActivity
 import com.example.adminfoodordering.model.AllMenu
 import com.example.adminfoodordering.databinding.MenuItemBinding
 import com.google.firebase.database.DatabaseReference
@@ -39,6 +41,17 @@ class AdapterMenu(
 
                 tvFoodName.text = menuItem.foodName
                 tvPrice.text = menuItem.foodPrice
+
+                // Sự kiện click item
+                root.setOnClickListener {
+                    val intent = Intent(context, EditFoodActivity::class.java)
+                    intent.putExtra("menuKey", menuItem.key) // Truyền key của món ăn
+                    intent.putExtra("menuName", menuItem.foodName)
+                    intent.putExtra("menuPrice", menuItem.foodPrice)
+                    intent.putExtra("menuImage", menuItem.foodImage)
+                    intent.putExtra("menuDescription", menuItem.foodDescription)
+                    context.startActivity(intent)
+                }
 
                 // Xóa item khi nhấn nút Delete
                 btnDelete.setOnClickListener {

@@ -110,6 +110,7 @@ class ShowListOrderActivity : AppCompatActivity() {
             if (status == "Accepted") {
                 val intent = Intent(this, ChooseShipperActivity::class.java)
                 intent.putExtra("ORDER_ID", pushKey) // Truyền orderId (pushKey)
+                intent.putExtra("USER_ID", userIds) // Truyền userId
                 startActivity(intent)
                 finish()
             } else {

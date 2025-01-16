@@ -16,6 +16,9 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".EditFoodActivity"
+            android:exported="false" />
+        <activity
             android:name=".ChooseShipperActivity"
             android:exported="false" />
         <activity android:name=".ReportActivity" />
@@ -25,7 +28,7 @@
         <activity
             android:name=".ManageAccountActivity"
             android:exported="false" />
-        <activity android:name="com.example.adminfoodordering.ShowListOrderActivity" />
+        <activity android:name=".ShowListOrderActivity" />
         <activity
             android:name=".PendingOrderActivity"
             android:exported="false" />

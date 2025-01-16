@@ -86,10 +86,11 @@ class ManageAccountActivity : AppCompatActivity(), AdapterUser.OnItemClickListen
             override fun onDataChange(snapshot: DataSnapshot) {
                 shipperList.clear()
                 for (shipperSnapshot in snapshot.children) {
+                    val shipperId = shipperSnapshot.key ?: continue
                     val name = shipperSnapshot.child("name").getValue(String::class.java) ?: "Không xác định"
                     val phone = shipperSnapshot.child("phone").getValue(String::class.java) ?: "Không xác định"
                     if (name.isNotBlank() && phone.isNotBlank()) {
-                        shipperList.add(Shipper(name, phone, "0.0", "0.0", ""))
+                        shipperList.add(Shipper(shipperId,name, phone, "0.0", "0.0", ""))
                     }
                 }
                 adapterShipper.notifyDataSetChanged()

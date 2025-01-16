@@ -36,7 +36,7 @@ class AllitemActivity : AppCompatActivity() {
         database = FirebaseDatabase.getInstance()
         val foodRef: DatabaseReference = database.reference.child("menu")
         // Fetch data from database
-        foodRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        foodRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 menuItems.clear()
                 for (foodSnapshot in snapshot.children) {
